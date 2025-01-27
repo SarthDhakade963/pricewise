@@ -1,5 +1,3 @@
-"use server";
-
 import Product from "@/lib/models/product.models";
 import { connectToDB } from "@/lib/mongoose";
 import { generateEmailBody, sendEmail } from "@/lib/nodemailer";
