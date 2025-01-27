@@ -61,7 +61,7 @@ const ProductDetails = async ({ params }: Props) => {
                   />
 
                   <p className="text-sm font-semibold text-[#D46F77]">
-                    {product.reviewCount || "100"}
+                    {product.reviews || "100"}
                   </p>
                 </div>
 
