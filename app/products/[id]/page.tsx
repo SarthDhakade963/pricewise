@@ -9,8 +9,8 @@ import PriceInfoCard from "@/components/PriceInfoCard";
 import ProductCard from "@/components/ProductCard";
 import Modal from "@/components/Modal";
 
-type Props = {
-  params: { id: string };
+interface Props {
+  params: Promise<{ id: string }>;
 };
 const ProductDetails = async ({ params }: Props) => {
   const resolvedParams = await params;
