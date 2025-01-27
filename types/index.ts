@@ -8,6 +8,7 @@ export type User = {
 };
 
 export type Product = {
+  reviewCount: string;
   reviews: number;
   _id?: string;
   url: string;
