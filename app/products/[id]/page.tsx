@@ -13,8 +13,7 @@ interface Props {
   params: Promise<{ id: string }>;
 };
 const ProductDetails = async ({ params }: Props) => {
-  const resolvedParams = await params;
-  const { id } = resolvedParams;
+  const { id } = await params;
 
   const product: Product = await getProductById(id);
 
