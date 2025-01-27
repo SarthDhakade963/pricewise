@@ -19,6 +19,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-responsive-carousel": "^3.2.23",
+    "supports-color": "^10.0.0",
     "twilio": "^5.4.2"
   },
   "devDependencies": {
