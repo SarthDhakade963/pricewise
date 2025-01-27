@@ -1,14 +1,20 @@
+"use server";
+
 import Product from "@/lib/models/product.models";
 import { connectToDB } from "@/lib/mongoose";
 import { generateEmailBody, sendEmail } from "@/lib/nodemailer";
 import { scrapeAmazonProduct } from "@/lib/scraper";
-import { getAveragePrice, getEmailNotifType, getHighestPrice, getLowestPrice } from "@/lib/util";
+import {
+  getAveragePrice,
+  getEmailNotifType,
+  getHighestPrice,
+  getLowestPrice,
+} from "@/lib/util";
 import { NextResponse } from "next/server";
-
 
 export const maxDuration = 50; // 1 minutes
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export const revalidate = 0;
 export async function GET() {
@@ -43,38 +49,43 @@ export async function GET() {
           averagePrice: getAveragePrice(updatedPriceHistory),
         };
 
-
         const updatedProduct = await Product.findOneAndUpdate(
           { url: product.url },
-          product,
+          product
         );
 
-
         // 2. CHECK EACH PRODUCT STATUS & SEND EMAIL ACCORDINGLY
-        const emailNotifType = getEmailNotifType(scrapedProduct, currentProduct);
+        const emailNotifType = getEmailNotifType(
+          scrapedProduct,
+          currentProduct
+        );
 
-        if(emailNotifType && updatedProduct.users.length > 0) {
-            const productInfo = {
-                title : updatedProduct.title,
-                url : updatedProduct.url,
-            } 
+        if (emailNotifType && updatedProduct.users.length > 0) {
+          const productInfo = {
+            title: updatedProduct.title,
+            url: updatedProduct.url,
+          };
 
-            const emailContent = await generateEmailBody(productInfo, emailNotifType);
+          const emailContent = await generateEmailBody(
+            productInfo,
+            emailNotifType
+          );
 
-            const userEmails = updatedProduct.users.map((user : any) => user.email);
+          const userEmails = updatedProduct.users.map(
+            (user: any) => user.email
+          );
 
-            await sendEmail(emailContent, userEmails);
+          await sendEmail(emailContent, userEmails);
         }
 
         return updatedProduct;
       })
     );
 
-
     return NextResponse.json({
-      message : 'ok',
-      data : updatedProducts
-    })
+      message: "ok",
+      data: updatedProducts,
+    });
   } catch (error) {
     throw new Error(`Error in GET : ${error}`);
   }
