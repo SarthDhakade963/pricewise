@@ -1,6 +1,3 @@
-"use server"
-
-import Product from "../models/product.models";
 import nodemailer from "nodemailer";
 import { EmailContent, EmailProductInfo, NotificationType } from "@/types";
 
@@ -68,7 +65,7 @@ export async function generateEmailBody(
       subject = `Discount Alert for ${shortenedTitle}`;
       body = `
         <div>
-          <h4>Hey, ${product.title} is now available at a discount more than ${THRESHOLD_PERCENTAGE}%!</h4>
+          <h4>Hey, ${product.title} is now available at a discount more than ${THRESHOLD_PERCENTAGE} %!</h4>
           <p>Grab it right away from <a href="${product.url}" target="_blank" rel="noopener noreferrer">here</a>.</p>
         </div>
       `;
