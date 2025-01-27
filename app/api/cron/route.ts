@@ -11,12 +11,10 @@ import {
   getLowestPrice,
 } from "@/lib/util";
 import { NextResponse } from "next/server";
-
+export const maxDuration = 50; // 1 minutes
+export const dynamic = "force-dynamic";
+export const revalidate = 10;
 export async function GET() {
-  const maxDuration = 50; // 1 minutes
-  const dynamic = "force-dynamic";
-
-  const revalidate = 10;
   try {
     connectToDB(); // connected to the Database
 
