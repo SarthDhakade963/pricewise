@@ -13,7 +13,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Spinner from "./Spinner";
 import { addUserPhoneNumberToProduct } from "@/lib/actions";
-import Product from "@/lib/models/product.models";
 
 interface Props {
   productId: string;

@@ -8,7 +8,7 @@ import {
   getLowestPrice,
   getMessageNotifType,
 } from "@/lib/util";
-import { sendWhatsapp } from "@/lib/nodemailer";
+import { sendSMS } from "@/lib/nodemailer";
 
 export const maxDuration = 30; // This function can run for a maximum of 300 seconds
 export const dynamic = "force-dynamic";
@@ -69,7 +69,7 @@ export async function GET(request: Request) {
             (user: any) => user.phoneNumber
           );
           // Send email notification
-          await sendWhatsapp(productInfo, messageNotifType, userPhoneNumber);
+          await sendSMS(productInfo, messageNotifType, userPhoneNumber);
         }
 
         return updatedProduct;
