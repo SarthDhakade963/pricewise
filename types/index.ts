@@ -3,8 +3,7 @@ export type PriceHistoryItem = {
 };
 
 export type User = {
-  moNum: any;
-  email: string;
+  phoneNumber: string;
 };
 
 export type Product = {

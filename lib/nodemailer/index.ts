@@ -1,107 +1,84 @@
 import nodemailer from "nodemailer";
 import { EmailContent, EmailProductInfo, NotificationType } from "@/types";
+import twilio from "twilio";
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID!;
+const authToken = process.env.TWILIO_AUTH_TOKEN!;
+const fromNumber = process.env.TWILIO_SMS_NUMBER!;
+
+const client = twilio(accountSid, authToken);
 
 export const THRESHOLD_PERCENTAGE = 40;
 
 export const Notification = {
   WELCOME: "WELCOME",
-  CHANGE_OF_STOCK : "CHANGE_OF_STOCK",
-  LOWEST_PRICE : "LOWEST_PRICE",
+  CHANGE_OF_STOCK: "CHANGE_OF_STOCK",
+  LOWEST_PRICE: "LOWEST_PRICE",
   THRESHOLD_MET: "THRESHOLD_MET",
 };
 
-export async function generateEmailBody(
+export async function generateWhatsappMessage(
   product: EmailProductInfo,
   type: NotificationType
 ) {
   const shortenedTitle =
     product.title.length > 20
       ? `${product.title.substring(0, 20)}...`
-      : `${product.title}`;
+      : product.title;
 
-  let subject = "";
   let body = "";
 
   switch (type) {
     case Notification.WELCOME:
-      subject = `Welcome to Price Tracking for ${shortenedTitle}`;
-      body = `
-        <div>
-          <h2>Welcome to PriceWise 🚀</h2>
-          <p>You are now tracking ${product.title}.</p>
-          <p>Here's an example of how you'll receive updates:</p>
-          <div style="border: 1px solid #ccc; padding: 10px; background-color: #f8f8f8;">
-            <h3>${product.title} is back in stock!</h3>
-            <p>We're excited to let you know that ${product.title} is now back in stock.</p>
-            <p>Don't miss out - <a href="${product.url}" target="_blank" rel="noopener noreferrer">buy it now</a>!</p>
-            <img src="https://i.ibb.co/pwFBRMC/Screenshot-2023-09-26-at-1-47-50-AM.png" alt="Product Image" style="max-width: 100%;" />
-          </div>
-          <p>Stay tuned for more updates on ${product.title} and other products you're tracking.</p>
-        </div>
-      `;
+      body = `🚀 Welcome to PriceWise!\n\nYou are now tracking: ${shortenedTitle}\n\nExample alert:\n✅ ${shortenedTitle} is back in stock!\nCheck it out: ${product.url}\n\nStay tuned for more updates.`;
       break;
 
     case Notification.CHANGE_OF_STOCK:
-      subject = `${shortenedTitle} is now back in stock!`;
-      body = `
-        <div>
-          <h4>Hey, ${product.title} is now restocked! Grab yours before they run out again!</h4>
-          <p>See the product <a href="${product.url}" target="_blank" rel="noopener noreferrer">here</a>.</p>
-        </div>
-      `;
+      body = `📦 Back in stock!\n${shortenedTitle} is now available again.\nGrab it here: ${product.url}`;
+
       break;
 
     case Notification.LOWEST_PRICE:
-      subject = `Lowest Price Alert for ${shortenedTitle}`;
-      body = `
-        <div>
-          <h4>Hey, ${product.title} has reached its lowest price ever!!</h4>
-          <p>Grab the product <a href="${product.url}" target="_blank" rel="noopener noreferrer">here</a> now.</p>
-        </div>
-      `;
+      body = `💰 Lowest Price Alert!\n${shortenedTitle} has reached its lowest price ever.\nSee it here: ${product.url}`;
       break;
 
     case Notification.THRESHOLD_MET:
-      subject = `Discount Alert for ${shortenedTitle}`;
-      body = `
-        <div>
-          <h4>Hey, ${product.title} is now available at a discount more than ${THRESHOLD_PERCENTAGE} %!</h4>
-          <p>Grab it right away from <a href="${product.url}" target="_blank" rel="noopener noreferrer">here</a>.</p>
-        </div>
-      `;
+      body = `🏷️ Discount Alert!\n${shortenedTitle} is now discounted more than ${THRESHOLD_PERCENTAGE}%!\nBuy now: ${product.url}`;
       break;
 
     default:
       throw new Error("Invalid notification type.");
   }
-  return { subject, body };
+
+  return { body };
 }
 
-const transporter = nodemailer.createTransport({
-  pool: true,
-  service: "hotmail",
-  port: 2525,
-  auth: {
-    user: "dummyproject09@outlook.com",
-    pass: process.env.EMAIL_PASSWORD,
-  },
-  maxConnections: 1,
-});
-
-export const sendEmail = async (
-  emailContent: EmailContent,
-  sendTo: string[]
+export const sendSMS = async (
+  product: EmailProductInfo,
+  type: NotificationType,
+  to: string
 ) => {
-  const mailOptions = {
-    from: "",
-    to: sendTo,
-    html: emailContent.body,
-    subject: emailContent.subject,
-  };
+  try {
+    const messageBody = await generateWhatsappMessage(product, type);
+    const toNumber = `+91${to}`;
+    console.log("From Number : " + fromNumber);
+    console.log("To Number : " + toNumber);
+    console.log("Message Body : " + messageBody.body);
 
-  transporter.sendMail(mailOptions, (error: any, info: any) => {
-    if (error) return console.log(error);
+    const message = await client.messages.create({
+      from: fromNumber,
+      to: toNumber,
+      body: messageBody.body,
+    });
 
-    console.log("Email sent : ", info);
-  });
+    console.log("SMS sent:", message.sid);
+
+    const status = await client.messages(message.sid).fetch();
+    console.log("Message status:", status.status);
+
+    return true;
+  } catch (error: any) {
+    console.error("Failed to send SMS:", error.message);
+    return false;
+  }
 };

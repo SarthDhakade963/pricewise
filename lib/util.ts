@@ -1,5 +1,4 @@
 import { PriceHistoryItem, Product } from "@/types";
-import exp from "constants";
 import { THRESHOLD_PERCENTAGE } from "./nodemailer";
 import { Notification } from "./nodemailer";
 
@@ -27,16 +26,21 @@ export function extractCurrency(input: any) {
 }
 
 export function extractDescription($: any) {
-  const selectors = [".a-unordered-list .a-list-item", "a-expander-content p"];
+  const selectors = ["#feature-bullets .a-list-item", "a-expander-content p"];
 
   for (const selector of selectors) {
     const elements = $(selector);
 
     if (elements.length > 0) {
       const textContent = elements
-        .map((_: any, element: any) => $(element).text().trim())
+        .map((_: any, element: any) => {
+          const text = $(element).text().trim().replaceAll("✅", "");
+          return text ? `✅ ${text}` : null; // skip empty
+        })
         .get()
+        .filter(Boolean) // remove nulls
         .join("\n");
+
       return textContent;
     }
   }
@@ -115,7 +119,7 @@ export const formatNumber = (num: number = 0) => {
   });
 };
 
-export const getEmailNotifType = (
+export const getMessageNotifType = (
   scrapedProduct: Product,
   currentProduct: Product
 ) => {

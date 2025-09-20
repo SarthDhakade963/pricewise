@@ -1,5 +1,5 @@
-import axios from "axios";
 import * as cheerio from "cheerio";
+import { chromium } from "playwright";
 import {
   extractCurrency,
   extractDescription,
@@ -7,34 +7,32 @@ import {
   extractPrice,
   extractReviewCount,
   extractStars,
-  getAveragePrice,
 } from "../util";
-import { log } from "console";
 
 export async function scrapeAmazonProduct(productURL: string) {
   if (!productURL) return;
 
-  // BrightData Proxy Configuration
-  const username = String(process.env.BRIGHT_DATA_USERNAME);
-  const password = String(process.env.BRIGHT_DATA_PASSWORD);
-  const port = 33335;
-  const session_id = (1000000 * Math.random()) | 0; // | 0 just removes the decimal part
-  const options = {
-    auth: {
-      username: `${username}-session-${session_id}`,
-      password,
-    },
-    host: "brd.superproxy.io",
-    port,
-    rejectUnauthorised: false,
-  };
+  // Launch browser
+  const browser = await chromium.launch({ headless: true });
+  const context = await browser.newContext({
+    userAgent:
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  });
+
+  const page = await context.newPage();
 
   try {
-    // fetch the product page
-    const response = await axios.get(productURL, options);
-    const $ = cheerio.load(response.data);
+    // Navigate to product page
+    await page.goto(productURL, {
+      waitUntil: "domcontentloaded",
+      timeout: 30000, // 30 seconds
+    });
 
-    // Extract the Product Title
+    const content = await page.content();
+
+    const $ = cheerio.load(content);
+
+    // Extract product details
     const title = $("#productTitle").text().trim();
 
     const currentPrice = extractPrice(
@@ -44,6 +42,8 @@ export async function scrapeAmazonProduct(productURL: string) {
     );
 
     const originalPrice = extractPrice(
+      $("#corePriceDisplay_desktop_feature_div .a-offscreen"),
+      $(".a-price-whole"),
       $("#priceblock_ourprice"),
       $(".a-price.a-text-price span.a-offscreen"),
       $("#listPrice"),
@@ -60,40 +60,50 @@ export async function scrapeAmazonProduct(productURL: string) {
       $("#landingImage").attr("data-a-dynamic-image");
 
     const imageURL = extractImage(image);
-
     const currency = extractCurrency($(".a-price-symbol"));
-
-    const discoutRate = parseInt($(".savingsPercentage").text().replace(/[-]/g, ""));
+    const discountRate = parseInt(
+      $(".savingsPercentage").text().replace(/[-]/g, "")
+    );
 
     const description = extractDescription($);
-
     const stars = extractStars($(".a-icon-alt"));
-    
+
     const reviewCount = extractReviewCount($("#acrCustomerReviewText"));
 
-    //  construct data object with scraped information
+    // Close browser after scraping
+    await browser.close();
 
-    const data = {
-      url : productURL,
-      title: title,
-      currentPrice: Number(currentPrice),
-      originalPrice: Number(originalPrice),
+    function safeNumber(value: string | number | undefined): number {
+      if (!value) return 0; // fallback if undefined or empty
+      const num = Number(String(value).replace(/[^0-9.]/g, ""));
+      return isNaN(num) ? 0 : num;
+    }
+
+    const currentPriceValue = safeNumber(currentPrice);
+    const originalPriceValue = safeNumber(originalPrice);
+
+    return {
+      url: productURL,
+      title,
+      currentPrice: currentPriceValue,
+      originalPrice: originalPriceValue,
       priceHistory: [],
       isOutOfStock: outOfStock,
       image: imageURL,
       currency: currency || "₹",
-      discountRate: discoutRate,
-      reviews : reviewCount,
-      stars: stars,
+      discountRate,
+      reviews: reviewCount,
+      stars,
       description,
-      lowestPrice: Number(currentPrice) || Number(originalPrice),
-      highestPrice: Number(originalPrice) || Number(currentPrice),
-      averagePrice : Number(currentPrice) || Number(originalPrice),
+      lowestPrice: currentPriceValue || originalPriceValue,
+      highestPrice: originalPriceValue || currentPriceValue,
+      averagePrice: currentPriceValue || originalPriceValue,
     };
-    
-    return data;
-    ;
   } catch (error: any) {
-    throw new Error(`Failed to scrape product : ${error.message}`);
+    await browser.close(); // make sure browser always closes
+    throw new Error(`Failed to scrape product: ${error.message}`);
   }
+}
+function $0(arg0: string): any {
+  throw new Error("Function not implemented.");
 }

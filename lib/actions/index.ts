@@ -1,13 +1,13 @@
 "use server";
 
-import { connect } from "http2";
+
 import { scrapeAmazonProduct } from "../scraper";
 import { connectToDB } from "../mongoose";
 import Product from "../models/product.models";
 import { getAveragePrice, getHighestPrice, getLowestPrice } from "../util";
 import { revalidatePath } from "next/cache";
 import { User } from "@/types";
-import { generateEmailBody, sendEmail } from "../nodemailer";
+import { sendSMS } from "../nodemailer";
 
 export async function scrapeAndStoreProduct(productURL: string) {
   if (!productURL) return;
@@ -50,18 +50,18 @@ export async function scrapeAndStoreProduct(productURL: string) {
   }
 }
 
-export async function getProductById(productId : string) {
-    try {
-        connectToDB();
+export async function getProductById(productId: string) {
+  try {
+    connectToDB();
 
-        const product = await Product.findOne({_id : productId});
+    const product = await Product.findOne({ _id: productId });
 
-        if(!product) return null;
+    if (!product) return null;
 
-        return product;
-    } catch (e) {
-        console.log("Failed to get Product Id");
-    }
+    return product;
+  } catch (e) {
+    console.log("Failed to get Product Id");
+  }
 }
 
 export async function getAllProducts() {
@@ -76,18 +76,17 @@ export async function getAllProducts() {
   }
 }
 
-export async function getSimilarProducts(productId : string) {
+export async function getSimilarProducts(productId: string) {
   try {
     connectToDB();
 
     const currentProduct = await Product.findById(productId);
-    
-    if(!currentProduct) return null;
+
+    if (!currentProduct) return null;
 
     const similarProducts = await Product.find({
-      _id : {$ne : productId} // ne = not equal to
+      _id: { $ne: productId }, // ne = not equal to
     }).limit(3);
-
 
     return similarProducts;
   } catch (error) {
@@ -95,26 +94,33 @@ export async function getSimilarProducts(productId : string) {
   }
 }
 
-export async function addUserEmailToProduct(productId : string, userEmail : string) {
+export async function addUserPhoneNumberToProduct(
+  productId: string,
+  userPhoneNumber: string
+) {
   try {
     // send our first message to whatsapp user
     const product = await Product.findById(productId);
 
-    if(!productId) return;
+    if (!productId) return;
 
-    const userExists = product.users.some((user : User) => user.email === userEmail);
+    const userExists = product.users.some(
+      (user: User) => user.phoneNumber === userPhoneNumber
+    );
 
-    if(!userExists) {
-      product.users.push({ email : userEmail});
+    if (!userExists) {
+      product.users.push({ phoneNumber: userPhoneNumber });
 
       await product.save();
 
-      const emailContent = generateEmailBody(product, "WELCOME");
+      const success = await sendSMS(product, "WELCOME", userPhoneNumber);
 
-      await sendEmail(await emailContent, [userEmail])
+      return success;
     }
+
+    return true;
   } catch (error) {
-    
+    console.error(error);
+    return false;
   }
 }
-

@@ -12,7 +12,7 @@ import {
 import { useState } from "react";
 import Image from "next/image";
 import Spinner from "./Spinner";
-import { addUserEmailToProduct } from "@/lib/actions";
+import { addUserPhoneNumberToProduct } from "@/lib/actions";
 import Product from "@/lib/models/product.models";
 
 interface Props {
@@ -25,26 +25,32 @@ const Modal = ({ productId }: Props) => {
 
   const [error, setError] = useState("");
 
-  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const validateInput = (e: ChangeEvent<HTMLInputElement>): void => {
-    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!regex.test(e.target.value)) {  
+    const regex = /^\d{10}$/;
+    if (!regex.test(e.target.value)) {
       setError("Invalid Email");
     } else {
       setError("");
     }
-    setEmail(e.target.value);
+    setPhoneNumber(e.target.value);
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    await addUserEmailToProduct(productId, email);
+    const isTracked = await addUserPhoneNumberToProduct(productId, phoneNumber);
+
+    if (isTracked) {
+      alert("We will update you about your Product!");
+    } else {
+      alert("Sorry, we are unable to send the sms");
+    }
 
     setIsSubmitting(false);
-    setEmail("");
+    setPhoneNumber("");
     closeModal();
   };
 
@@ -143,11 +149,11 @@ const Modal = ({ productId }: Props) => {
 
                     <input
                       required
-                      id="email"
-                      name="email"
-                      placeholder="Enter your Outlook Email"
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      placeholder="Enter your Whatsapp Number"
                       className="dialog-input"
-                      value={email}
+                      value={phoneNumber}
                       onChange={validateInput}
                     />
                   </div>
