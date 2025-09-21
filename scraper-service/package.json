@@ -6,7 +6,7 @@
     "dev": "ts-node server.ts",
     "start": "node dist/server.js",
     "build": "tsc",
-    "postinstall": "puppeteer install"
+    "postinstall": "npx puppeteer browsers install chrome"
   },
   "dependencies": {
     "body-parser": "^2.2.0",
