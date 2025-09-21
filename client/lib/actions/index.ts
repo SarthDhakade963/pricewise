@@ -14,7 +14,7 @@ export async function scrapeAndStoreProduct(productURL: string) {
     connectToDB();
 
     const scrapedProduct = await scrapeAmazonProduct(productURL);
-    
+
     if (!scrapedProduct) return;
 
     let product = scrapedProduct;
@@ -128,7 +128,7 @@ export async function scrapeAmazonProduct(
   productUrl: string
 ): Promise<ScrapedProduct | null> {
   try {
-    const res = await fetch("https://your-render-app.onrender.com/scrape", {
+    const res = await fetch("https://pricewise-yb6b.onrender.com/scrape", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: productUrl }),
