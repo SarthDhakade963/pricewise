@@ -1,8 +1,10 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { scrapeAmazonProduct } from "./scraper";
+import cors from "cors";
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 // health check
@@ -24,7 +26,7 @@ app.post("/scrape", async (req, res) => {
     if (!product) {
       return res.status(404).json({ error: "Could not scrape product" });
     }
-    
+
     res.json(product);
   } catch (err: any) {
     console.error("Scraping failed:", err.message);
