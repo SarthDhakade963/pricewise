@@ -15,7 +15,7 @@ export async function scrapeAndStoreProduct(productURL: string) {
 
     const scrapedProduct = await scrapeAmazonProduct(productURL);
 
-    if (!scrapedProduct) return;
+    if (!scrapedProduct) throw new Error("Could not scrape product");
 
     let product = scrapedProduct;
 
@@ -135,7 +135,7 @@ export async function scrapeAmazonProduct(
     });
 
     const scrapedProduct: ScrapedProduct = await res.json();
-
+    console.log(scrapedProduct);
     return scrapedProduct;
   } catch (error) {
     console.error("Failed to fetch scraped product:", error);
