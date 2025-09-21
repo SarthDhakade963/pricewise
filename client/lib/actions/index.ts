@@ -11,16 +11,10 @@ export async function scrapeAndStoreProduct(productURL: string) {
   if (!productURL) return;
 
   try {
-    await connectToDB();
+    connectToDB();
 
-    const res = await fetch("https://your-render-app.onrender.com/scrape", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: productURL }),
-    });
-
-    const scrapedProduct: ScrapedProduct = await res.json();
-
+    const scrapedProduct = await scrapeAmazonProduct(productURL);
+    
     if (!scrapedProduct) return;
 
     let product = scrapedProduct;
@@ -56,7 +50,7 @@ export async function scrapeAndStoreProduct(productURL: string) {
 
 export async function getProductById(productId: string) {
   try {
-    await connectToDB();
+    connectToDB();
 
     const product = await Product.findOne({ _id: productId });
 
@@ -70,7 +64,7 @@ export async function getProductById(productId: string) {
 
 export async function getAllProducts() {
   try {
-    await connectToDB();
+    connectToDB();
 
     const products = await Product.find();
 
@@ -82,7 +76,7 @@ export async function getAllProducts() {
 
 export async function getSimilarProducts(productId: string) {
   try {
-    await connectToDB();
+    connectToDB();
 
     const currentProduct = await Product.findById(productId);
 
@@ -127,5 +121,24 @@ export async function addUserPhoneNumberToProduct(
   } catch (error) {
     console.error(error);
     return false;
+  }
+}
+
+export async function scrapeAmazonProduct(
+  productUrl: string
+): Promise<ScrapedProduct | null> {
+  try {
+    const res = await fetch("https://your-render-app.onrender.com/scrape", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: productUrl }),
+    });
+
+    const scrapedProduct: ScrapedProduct = await res.json();
+
+    return scrapedProduct;
+  } catch (error) {
+    console.error("Failed to fetch scraped product:", error);
+    return null;
   }
 }
