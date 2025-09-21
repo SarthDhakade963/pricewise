@@ -55,7 +55,7 @@ RUN npm install
 COPY . .
 
 # Install Puppeteer browsers
-RUN npx puppeteer install
+RUN npx puppeteer browsers install chrome
 
 # Build TypeScript
 RUN npm run build
