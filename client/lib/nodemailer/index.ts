@@ -1,13 +1,20 @@
 "use server";
 import { EmailProductInfo, NotificationType } from "@/types";
-import twilio from "twilio";
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID!;
-const authToken = process.env.TWILIO_AUTH_TOKEN!;
+let twilioClient: any;
+
+async function getTwilioClient() {
+  if (!twilioClient) {
+    const Twilio = (await import("twilio")).default;
+    twilioClient = Twilio(
+      process.env.TWILIO_ACCOUNT_SID!,
+      process.env.TWILIO_AUTH_TOKEN!
+    );
+  }
+  return twilioClient;
+}
+
 const fromNumber = process.env.TWILIO_SMS_NUMBER!;
-
-const client = twilio(accountSid, authToken);
-
 const THRESHOLD_PERCENTAGE = 40;
 
 const Notification = {
@@ -35,7 +42,6 @@ export async function generateWhatsappMessage(
 
     case Notification.CHANGE_OF_STOCK:
       body = `📦 Back in stock!\n${shortenedTitle} is now available again.\nGrab it here: ${product.url}`;
-
       break;
 
     case Notification.LOWEST_PRICE:
@@ -61,9 +67,11 @@ export const sendSMS = async (
   try {
     const messageBody = await generateWhatsappMessage(product, type);
     const toNumber = `+91${to}`;
-    console.log("From Number : " + fromNumber);
-    console.log("To Number : " + toNumber);
-    console.log("Message Body : " + messageBody.body);
+    console.log("From Number:", fromNumber);
+    console.log("To Number:", toNumber);
+    console.log("Message Body:", messageBody.body);
+
+    const client = await getTwilioClient(); // dynamic import
 
     const message = await client.messages.create({
       from: fromNumber,
@@ -73,6 +81,7 @@ export const sendSMS = async (
 
     console.log("SMS sent:", message.sid);
 
+    // Fetch status (optional)
     const status = await client.messages(message.sid).fetch();
     console.log("Message status:", status.status);
 
