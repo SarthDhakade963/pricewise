@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "ts-node server.ts",
     "start": "node dist/server.js",
-    "build": "tsc"
+    "build": "tsc",
+    "postinstall": "npx playwright install --with-deps"
   },
   "dependencies": {
     "body-parser": "^2.2.0",
