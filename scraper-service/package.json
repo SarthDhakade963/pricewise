@@ -5,15 +5,16 @@
   "scripts": {
     "dev": "ts-node server.ts",
     "start": "node dist/server.js",
-    "build": "tsc",
-    "postinstall": "npx playwright install"
+    "build": "tsc"
   },
   "dependencies": {
+    "@playwright/test": "^1.55.0",
     "body-parser": "^2.2.0",
     "cheerio": "^1.1.2",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "playwright": "^1.55.0",
+    "playwright-core": "^1.55.0",
     "puppeteer": "^23.1.1"
   },
   "devDependencies": {

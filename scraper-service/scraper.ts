@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { chromium } from "playwright";
+import { chromium } from "playwright-core";
 import {
   extractCurrency,
   extractDescription,
@@ -15,7 +15,9 @@ export async function scrapeAmazonProduct(productURL: string) {
   // Launch browser
   const browser = await chromium.launch({
     headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    executablePath: require("playwright-core/lib/utils").getExecutablePath(
+      "chromium"
+    ),
   });
   const context = await browser.newContext({
     userAgent:
