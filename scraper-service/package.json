@@ -6,7 +6,7 @@
     "dev": "ts-node server.ts",
     "start": "node dist/server.js",
     "build": "tsc",
-    "postinstall": "npx playwright install --with-deps"
+    "postinstall": "npx playwright install chromium"
   },
   "dependencies": {
     "body-parser": "^2.2.0",
