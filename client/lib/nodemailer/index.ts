@@ -1,3 +1,4 @@
+"use server";
 import { EmailProductInfo, NotificationType } from "@/types";
 import twilio from "twilio";
 
