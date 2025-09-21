@@ -10,6 +10,7 @@ app.use(
   })
 );
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // health check
 app.get("/", (_req, res) => {
@@ -18,8 +19,8 @@ app.get("/", (_req, res) => {
 
 // scrape endpoint
 app.post("/scrape", async (req, res) => {
-  const { url } = req.body;
-
+  const { url } = req.body || {};
+  console.log(req.body);
   if (!url) {
     return res.status(400).json({ error: "Missing url" });
   }
@@ -38,7 +39,7 @@ app.post("/scrape", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 8080;
+const PORT = 8080;
 app.listen(PORT, () => {
   console.log(`Scraper running on port ${PORT}`);
 });
