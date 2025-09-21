@@ -15,7 +15,8 @@ export async function scrapeAmazonProduct(productURL: string) {
   // Launch browser
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    executablePath:
+      process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 
@@ -97,8 +98,7 @@ export async function scrapeAmazonProduct(productURL: string) {
       averagePrice: currentPriceValue || originalPriceValue,
     };
   } catch (error: any) {
-    await browser.close(); // make sure browser always closes
-    throw new Error(`Failed to scrape product: ${error.message}`);
+      throw new Error(`Failed to scrape product: ${error.message}`);
   } finally {
     // Close browser after scraping
     await browser.close();
