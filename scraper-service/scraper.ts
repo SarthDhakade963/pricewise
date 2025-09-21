@@ -1,5 +1,5 @@
 import * as cheerio from "cheerio";
-import { chromium } from "playwright";
+import puppeteer from "puppeteer";
 import {
   extractCurrency,
   extractDescription,
@@ -13,15 +13,13 @@ export async function scrapeAmazonProduct(productURL: string) {
   if (!productURL) return;
 
   // Launch browser
-  const browser = await chromium.launch({
+  const browser = await puppeteer.launch({
     headless: true,
   });
-  const context = await browser.newContext({
-    userAgent:
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-  });
-
-  const page = await context.newPage();
+  const page = await browser.newPage();
+  await page.setUserAgent(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  );
 
   try {
     // Navigate to product page
