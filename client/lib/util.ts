@@ -1,7 +1,13 @@
 import { PriceHistoryItem, Product, ScrapedProduct } from "@/types";
-import { Notification } from "./nodemailer";
 
 const THRESHOLD_PERCENTAGE = 40;
+
+const Notification = {
+  WELCOME: "WELCOME",
+  CHANGE_OF_STOCK: "CHANGE_OF_STOCK",
+  LOWEST_PRICE: "LOWEST_PRICE",
+  THRESHOLD_MET: "THRESHOLD_MET",
+};
 
 export function extractPrice(...elements: any) {
   for (const element of elements) {
