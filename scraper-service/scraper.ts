@@ -15,11 +15,11 @@ export async function scrapeAmazonProduct(productURL: string) {
   // Launch browser
   const browser = await puppeteer.launch({
     headless: true,
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
+
   const page = await browser.newPage();
-  await page.setUserAgent(
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-  );
 
   try {
     // Navigate to product page
@@ -52,7 +52,7 @@ export async function scrapeAmazonProduct(productURL: string) {
     );
 
     const outOfStock =
-      $("#availabilit span").text().trim().toLowerCase() ===
+      $("#availability span").text().trim().toLowerCase() ===
       "currently unavailable";
 
     const image =
@@ -69,9 +69,6 @@ export async function scrapeAmazonProduct(productURL: string) {
     const stars = extractStars($(".a-icon-alt"));
 
     const reviewCount = extractReviewCount($("#acrCustomerReviewText"));
-
-    // Close browser after scraping
-    await browser.close();
 
     function safeNumber(value: string | number | undefined): number {
       if (!value) return 0; // fallback if undefined or empty
@@ -102,8 +99,8 @@ export async function scrapeAmazonProduct(productURL: string) {
   } catch (error: any) {
     await browser.close(); // make sure browser always closes
     throw new Error(`Failed to scrape product: ${error.message}`);
+  } finally {
+    // Close browser after scraping
+    await browser.close();
   }
-}
-function $0(arg0: string): any {
-  throw new Error("Function not implemented.");
 }
