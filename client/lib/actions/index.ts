@@ -127,6 +127,7 @@ export async function addUserPhoneNumberToProduct(
 export async function scrapeAmazonProduct(
   productUrl: string
 ): Promise<ScrapedProduct | null> {
+  console.log("Product URL : " + productUrl);
   try {
     const res = await fetch("https://pricewise-yb6b.onrender.com/scrape", {
       method: "POST",
@@ -136,8 +137,8 @@ export async function scrapeAmazonProduct(
 
     const scrapedProduct: ScrapedProduct = await res.json();
 
-    console.log(scrapedProduct);
-    
+    console.log("Scraped Product : " + scrapedProduct);
+
     return scrapedProduct;
   } catch (error) {
     console.error("Failed to fetch scraped product:", error);
