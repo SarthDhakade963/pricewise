@@ -129,7 +129,7 @@ export async function scrapeAmazonProduct(
 ): Promise<ScrapedProduct | null> {
   console.log("Product URL : " + productUrl);
   try {
-    const res = await fetch("https://pricewise-yb6b.onrender.com/scrape", {
+    const res = await fetch("https://pricewise-tx5q.onrender.com/scrape", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: productUrl }),
