@@ -13,14 +13,8 @@ export async function scrapeAndStoreProduct(productURL: string) {
   try {
     await connectToDB();
 
-    const res = await fetch("https://your-render-app.onrender.com/scrape", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: productURL }),
-    });
-
-    const scrapedProduct: ScrapedProduct = await res.json();
-
+    const scrapedProduct = await scrapeAmazonProduct(productURL);
+    
     if (!scrapedProduct) return;
 
     let product = scrapedProduct;
@@ -127,5 +121,24 @@ export async function addUserPhoneNumberToProduct(
   } catch (error) {
     console.error(error);
     return false;
+  }
+}
+
+async function scrapeAmazonProduct(
+  productUrl: string
+): Promise<ScrapedProduct | null> {
+  try {
+    const res = await fetch("https://your-render-app.onrender.com/scrape", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: productUrl }),
+    });
+
+    const scrapedProduct: ScrapedProduct = await res.json();
+
+    return scrapedProduct;
+  } catch (error) {
+    console.error("Failed to fetch scraped product:", error);
+    return null;
   }
 }
