@@ -30,10 +30,12 @@ const SearchBar = () => {
 
       // Scrape the product page
       const product = await scrapeAndStoreProduct(searchPrompt);
+
+      console.log("Scraped product to search bar : " + product);
+
+      setIsLoading(false);
     } catch (error) {
       console.log(error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
