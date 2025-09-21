@@ -1,4 +1,4 @@
-import { PriceHistoryItem, Product } from "@/types";
+import { PriceHistoryItem, Product, ScrapedProduct } from "@/types";
 import { THRESHOLD_PERCENTAGE } from "./nodemailer";
 import { Notification } from "./nodemailer";
 
@@ -120,7 +120,7 @@ export const formatNumber = (num: number = 0) => {
 };
 
 export const getMessageNotifType = (
-  scrapedProduct: Product,
+  scrapedProduct: ScrapedProduct,
   currentProduct: Product
 ) => {
   const lowestPrice = getLowestPrice(currentProduct.priceHistory);
@@ -133,7 +133,10 @@ export const getMessageNotifType = (
     return Notification.CHANGE_OF_STOCK as keyof typeof Notification;
   }
 
-  if (scrapedProduct.discountRate >= THRESHOLD_PERCENTAGE) {
+  if (
+    scrapedProduct.discountRate &&
+    scrapedProduct.discountRate >= THRESHOLD_PERCENTAGE
+  ) {
     return Notification.THRESHOLD_MET as keyof typeof Notification;
   }
 

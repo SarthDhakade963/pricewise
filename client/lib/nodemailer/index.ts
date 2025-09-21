@@ -1,5 +1,4 @@
-import nodemailer from "nodemailer";
-import { EmailContent, EmailProductInfo, NotificationType } from "@/types";
+import { EmailProductInfo, NotificationType } from "@/types";
 import twilio from "twilio";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID!;

@@ -11,7 +11,7 @@ export async function scrapeAndStoreProduct(productURL: string) {
   if (!productURL) return;
 
   try {
-    await connectToDB();
+    connectToDB();
 
     const scrapedProduct = await scrapeAmazonProduct(productURL);
     
@@ -50,7 +50,7 @@ export async function scrapeAndStoreProduct(productURL: string) {
 
 export async function getProductById(productId: string) {
   try {
-    await connectToDB();
+    connectToDB();
 
     const product = await Product.findOne({ _id: productId });
 
@@ -64,7 +64,7 @@ export async function getProductById(productId: string) {
 
 export async function getAllProducts() {
   try {
-    await connectToDB();
+    connectToDB();
 
     const products = await Product.find();
 
@@ -76,7 +76,7 @@ export async function getAllProducts() {
 
 export async function getSimilarProducts(productId: string) {
   try {
-    await connectToDB();
+    connectToDB();
 
     const currentProduct = await Product.findById(productId);
 
@@ -124,7 +124,7 @@ export async function addUserPhoneNumberToProduct(
   }
 }
 
-async function scrapeAmazonProduct(
+export async function scrapeAmazonProduct(
   productUrl: string
 ): Promise<ScrapedProduct | null> {
   try {
