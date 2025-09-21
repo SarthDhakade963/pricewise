@@ -8,7 +8,7 @@ const fromNumber = process.env.TWILIO_SMS_NUMBER!;
 
 const client = twilio(accountSid, authToken);
 
-export const THRESHOLD_PERCENTAGE = 40;
+const THRESHOLD_PERCENTAGE = 40;
 
 export const Notification = {
   WELCOME: "WELCOME",

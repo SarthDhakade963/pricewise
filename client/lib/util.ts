@@ -1,6 +1,7 @@
 import { PriceHistoryItem, Product, ScrapedProduct } from "@/types";
-import { THRESHOLD_PERCENTAGE } from "./nodemailer";
 import { Notification } from "./nodemailer";
+
+const THRESHOLD_PERCENTAGE = 40;
 
 export function extractPrice(...elements: any) {
   for (const element of elements) {
