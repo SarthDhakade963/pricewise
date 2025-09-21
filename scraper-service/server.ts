@@ -4,7 +4,11 @@ import { scrapeAmazonProduct } from "./scraper";
 import cors from "cors";
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://pricewise-bacvztqf6-sarthak-dhakades-projects.vercel.app/",
+  })
+);
 app.use(bodyParser.json());
 
 // health check
