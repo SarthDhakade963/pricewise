@@ -6,6 +6,8 @@ import { getAveragePrice, getHighestPrice, getLowestPrice } from "../util";
 import { revalidatePath } from "next/cache";
 import { ScrapedProduct, User } from "@/types";
 import { sendSMS } from "../nodemailer";
+import https from "https";
+import axios from "axios";
 
 export async function scrapeAndStoreProduct(productURL: string) {
   if (!productURL) return;
@@ -129,17 +131,18 @@ export async function scrapeAmazonProduct(
 ): Promise<ScrapedProduct | null> {
   console.log("Product URL : " + productUrl);
   try {
-    const res = await fetch("https://production-asia-southeast1-eqsg3a.railway-registry.com", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: productUrl }),
-    });
+    const res = await axios.post(
+      "https://production-asia-southeast1-eqsg3a.railway-registry.com",
+      { url: productUrl },
+      {
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }), // bypass self-signed cert
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
-    const scrapedProduct: ScrapedProduct = await res.json();
+    console.log("Scraped Product : " + res.data);
 
-    console.log("Scraped Product : " + scrapedProduct);
-
-    return scrapedProduct;
+    return res.data as ScrapedProduct;
   } catch (error) {
     console.error("Failed to fetch scraped product:", error);
     return null;
