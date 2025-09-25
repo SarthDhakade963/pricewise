@@ -132,7 +132,7 @@ export async function scrapeAmazonProduct(
   console.log("Product URL : " + productUrl);
   try {
     const res = await axios.post(
-      "https://production-asia-southeast1-eqsg3a.railway-registry.com",
+      "https://production-asia-southeast1-eqsg3a.railway-registry.com/scrape",
       { url: productUrl },
       {
         httpsAgent: new https.Agent({ rejectUnauthorized: false }), // bypass self-signed cert
