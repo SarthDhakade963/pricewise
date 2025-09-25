@@ -129,7 +129,7 @@ export async function scrapeAmazonProduct(
 ): Promise<ScrapedProduct | null> {
   console.log("Product URL : " + productUrl);
   try {
-    const res = await fetch("production-asia-southeast1-eqsg3a.railway-registry.com", {
+    const res = await fetch("https://production-asia-southeast1-eqsg3a.railway-registry.com", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: productUrl }),
