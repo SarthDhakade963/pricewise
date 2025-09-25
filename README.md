@@ -7,7 +7,7 @@ It uses **Puppeteer + Cheerio** for scraping e-commerce sites (like Amazon) and 
 
 ## 📸 Preview
 
-![PriceWise Screenshot](client/public/assets/image1.png)
+![PriceWise Screenshot](client/public/assets/image3.png)
 
 ![PriceWise Screenshot](client/public/assets/image2.png)
 
